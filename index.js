@@ -6,6 +6,8 @@ var urlencodedParser = bodyParser.urlencoded({extended: false})
 app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.set("views", "./views");
+app.use('/static', express.static('./img'));
+app.use('/css', express.static('./css'));
 app.listen(3000);
 
 var topic_light = "Topic/LightD";
