@@ -1,5 +1,5 @@
 var express = require("express");
-var app = express();
+var app = express()
 var bodyParser = require('body-parser')
 var urlencodedParser = bodyParser.urlencoded({extended: false})
 
@@ -8,8 +8,10 @@ app.set("view engine", "ejs");
 app.set("views", "./views");
 app.listen(3000);
 
-var Topic = 'mqtt/test_3'; //subscribe to all topics
-var Broker_URL = 'mqtt://13.75.111.201:1883';
+var topic_light = "Topic/LightD";
+var Topic = 'mqttbox/temp';
+var Topic_2 = 'mqttbox/light'; //subscribe to all topics
+var Broker_URL = 'mqtt://broker.hivemq.com:1883';
 var Database_URL = 'localhost';
 
 // MQTT
@@ -32,11 +34,17 @@ client.on('close', mqtt_close);
 
 function mqtt_connect() {
     console.log("Connecting MQTT");
-    client.subscribe(Topic, mqtt_subscribe);
+	client.subscribe(Topic, mqtt_subscribe);
+	client.subscribe(Topic_2, mqtt_subscribe_2);
 };
 
 function mqtt_subscribe(err, granted) {
     console.log("Subscribed to " + Topic);
+    if (err) {console.log(err);}
+};
+
+function mqtt_subscribe_2(err, granted) {
+    console.log("Subscribed to " + Topic_2);
     if (err) {console.log(err);}
 };
 
@@ -65,7 +73,8 @@ function mqtt_messsageReceived(topic, message, packet) {
 	// 	console.log(device_id);
 	// }
 	insert_message(topic, value_mes, packet);
-
+	check_message(topic, value_mes, packet);
+	//console.log(Math.floor(Math.random() * 10) + 1);
 
 };
 
@@ -91,13 +100,23 @@ pool.getConnection(function(err, connection){
 function insert_message(topic, value_mes, packet) {
 	pool.getConnection(function(err, connection){
 		// console.log('Database connected!')
+		//console.log(value_mes);
+		var sql, value_1, value_2, params, device_id;
 		for (var i = 0; i < value_mes.length; i++) {
-			var sql = "INSERT INTO ?? (??,??,??,??) VALUES (?,?,?,?)";
-			var device_id = value_mes[i]['device_id'];
-
-			var value_1, value_2;
-			value_1 = value_mes[i]['value'][0];
-			value_2 = value_mes[i]['value'][1];
+			device_id = value_mes[i]['device_id'];
+			if(value_mes[i]['values'].length > 1)
+			{
+				sql = "INSERT INTO ?? (??,??,??,??) VALUES (?,?,?,?)";
+				value_1 = value_mes[i]['values'][0];
+				value_2 = value_mes[i]['values'][1];
+				params = ['MQTT', 'device_id', 'temp', 'topic', 'humid', device_id, value_1, topic, value_2];
+			}
+			else if(value_mes[i]['values'].length == 1)
+			{
+				sql = "INSERT INTO ?? (??,??,??) VALUES (?,?,?)";
+				value_1 = value_mes[i]['values'][0];
+				params = ['MQTT_Light', 'device_id', 'color', 'topic', device_id, value_1, topic];
+			}
 
 			// var value;
 			// if (value_mes[i].value.length > 1)
@@ -113,7 +132,7 @@ function insert_message(topic, value_mes, packet) {
 			// console.log(value_mes[i]['value'][0]);
 			// console.log(device_id);
 			// console.log(value);
-			var params = ['MQTT', 'device_id', 'temp', 'topic', 'humid', device_id, value_1, topic, value_2];
+			// var params = ['MQTT', 'device_id', 'temp', 'topic', 'humid', device_id, value_1, topic, value_2];
 			sql = mysql.format(sql, params);
 			connection.query(sql, function (error, results) {
 				if (error) throw error;
@@ -121,6 +140,48 @@ function insert_message(topic, value_mes, packet) {
 			}); 
 		}
 	})
+};	
+
+function check_message(topic, value_mes, packet) {
+		// console.log('Database connected!')
+		// console.log(value_mes);
+		var value_1, value_2, value_3, device_id;
+		device_id = "LightD";
+		value_3 = 1;
+		var color;
+		for (var i = 0; i < value_mes.length; i++) {
+			if(value_mes[i]['values'].length > 1)
+			{
+				value_1 = value_mes[i]['values'][0];
+				value_2 = value_mes[i]['values'][1];
+			}
+			else if(value_mes[i]['values'].length == 1)
+			{
+				value_1 = value_mes[i]['values'][0];
+			}
+		}
+
+		if(value_1 < 10)
+		{
+			color = 222;
+		}
+		if(value_1 > 11 && value_1 < 25)
+		{
+			color = 166;
+		}
+		else if(value_1 > 25)
+		{
+			color = 77;
+		}
+
+		var str = [{device_id: device_id.toString() ,values: [value_3.toString(), color.toString()]}];
+		var message = JSON.stringify(str);
+		if (client.connected == true){
+			client.publish(topic_light, message);
+			// console.log("sent");
+		}
+		// console.log(message);
+
 };	
 
 
