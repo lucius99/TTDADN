@@ -212,6 +212,10 @@ app.get("/list", function(req, res){
 });
 
 
+          // Don't use the connection here, it has been returned to the pool.
+            //console.log(results[1].device_id);
+
+
 app.get("/public", function(req, res){
     // show form
     res.render("public.ejs")
