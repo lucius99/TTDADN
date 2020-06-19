@@ -3,17 +3,22 @@ var app = express()
 var bodyParser = require('body-parser')
 var urlencodedParser = bodyParser.urlencoded({extended: false})
 
-app.use(express.static("public"));
+//app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.set("views", "./views");
 app.use('/static', express.static('./img'));
 app.use('/css', express.static('./css'));
-app.listen(3000);
+// sua cho nay---------------------------------------------------------
+var server = require("http").Server(app);
+var io = require("socket.io")(server);
+server.listen(3000);
+var latestData;
+// sua cho nay---------------------------------------------------------
 
 var topic_light = "Topic/LightD";
 var Topic = 'mqttbox/temp';
 var Topic_2 = 'mqttbox/light'; //subscribe to all topics
-var Broker_URL = 'mqtt://broker.hivemq.com:1883';
+var Broker_URL = 'mqtt://13.75.111.201:1883';
 var Database_URL = 'localhost';
 
 // MQTT
@@ -74,11 +79,27 @@ function mqtt_messsageReceived(topic, message, packet) {
 	// 	var device_id = value_mes[i]['device_id'];
 	// 	console.log(device_id);
 	// }
+	// sua cho nay---------------------------------------------------------
+	console.log(value_mes);
+	latestData = value_mes;
+	// sua cho nay---------------------------------------------------------
 	insert_message(topic, value_mes, packet);
 	check_message(topic, value_mes, packet);
 	//console.log(Math.floor(Math.random() * 10) + 1);
 
 };
+
+// sua cho nay---------------------------------------------------------
+//latestData = mqtt_messsageReceived();
+io.on('connection', function(socket){
+	socket.emit('data', latestData);
+})
+
+setInterval(function(){
+	io.emit('data',latestData);
+	console.log('Last updated: ' + latestData);
+}, 3000);
+// sua cho nay---------------------------------------------------------
 
 function mqtt_close() {
 	console.log("Close MQTT");
@@ -104,6 +125,7 @@ function insert_message(topic, value_mes, packet) {
 		// console.log('Database connected!')
 		//console.log(value_mes);
 		var sql, value_1, value_2, params, device_id;
+		//console.log(value_mes.length);
 		for (var i = 0; i < value_mes.length; i++) {
 			device_id = value_mes[i]['device_id'];
 			if(value_mes[i]['values'].length > 1)
@@ -111,30 +133,14 @@ function insert_message(topic, value_mes, packet) {
 				sql = "INSERT INTO ?? (??,??,??,??) VALUES (?,?,?,?)";
 				value_1 = value_mes[i]['values'][0];
 				value_2 = value_mes[i]['values'][1];
-				params = ['MQTT', 'device_id', 'temp', 'topic', 'humid', device_id, value_1, topic, value_2];
+				params = ['mqtt_temp', 'device_id', 'temp', 'topic', 'humid', device_id, value_1, topic, value_2];
 			}
 			else if(value_mes[i]['values'].length == 1)
 			{
 				sql = "INSERT INTO ?? (??,??,??) VALUES (?,?,?)";
 				value_1 = value_mes[i]['values'][0];
-				params = ['MQTT_Light', 'device_id', 'color', 'topic', device_id, value_1, topic];
+				params = ['mqtt_light', 'device_id', 'color', 'topic', device_id, value_1, topic];
 			}
-
-			// var value;
-			// if (value_mes[i].value.length > 1)
-			// {
-			// 	value = value_mes[i]['value'][0] + "-" + value_mes[i]['value'][1];
-			// }
-			// else
-			// {
-			// 	value = value_mes[i]['value'];
-			// }
-
-
-			// console.log(value_mes[i]['value'][0]);
-			// console.log(device_id);
-			// console.log(value);
-			// var params = ['MQTT', 'device_id', 'temp', 'topic', 'humid', device_id, value_1, topic, value_2];
 			sql = mysql.format(sql, params);
 			connection.query(sql, function (error, results) {
 				if (error) throw error;
@@ -187,16 +193,31 @@ function check_message(topic, value_mes, packet) {
 };	
 
 
-app.get("/", function(req, res){
-    res.render("main");
-})
+// app.get("/", function(req, res){
+//     res.render("main");
+// })
+
+app.get("/home",function(req,res){
+	pool.getConnection(function(err,connection){
+	if (err) throw err;
+	
+		connection.query('SELECT * FROM web_test.mqtt_temp ORDER BY id ASC', function(error, results, fields){
+			connection.release();
+			if (error) {
+				res.end();
+				throw error;
+			}	
+			res.render("main.ejs", { danhsach: results });
+		})
+	})
+});
 
 app.get("/list", function(req, res){
     pool.getConnection(function(err, connection) {
         if (err) throw err; // not connected!
       
         // Use the connection
-        connection.query('SELECT * FROM web_test.MQTT ORDER BY id ASC', function (error, results, fields) {
+        connection.query('SELECT * FROM web_test.mqtt_temp ORDER BY id ASC', function (error, results, fields) {
           // When done with the connection, release it.
             connection.release();
       
@@ -218,6 +239,8 @@ app.get("/public", function(req, res){
     // show form
     res.render("public.ejs")
 });
+
+
 
 app.post("/public", urlencodedParser, function(req, res){
     var device_id = req.body.txtID.toString();
