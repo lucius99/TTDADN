@@ -1,14 +1,23 @@
-var express = require("express")
+var express = require("express");
 var app = express()
 var bodyParser = require('body-parser')
 var urlencodedParser = bodyParser.urlencoded({extended: false})
 
-app.use(express.static("public"));
+//app.use(express.static("public"));
 app.set("view engine", "ejs");
 app.set("views", "./views");
-app.listen(3000);
+app.use('/static', express.static('./img'));
+app.use('/css', express.static('./css'));
+// sua cho nay---------------------------------------------------------
+var server = require("http").Server(app);
+var io = require("socket.io")(server);
+server.listen(3000);
+var latestData;
+// sua cho nay---------------------------------------------------------
 
-var Topic = 'mqtt/test_3'; //subscribe to all topics
+var topic_light = "Topic/LightD";
+var Topic = 'mqttbox/temp';
+var Topic_2 = 'mqttbox/light'; //subscribe to all topics
 var Broker_URL = 'mqtt://13.75.111.201:1883';
 var Database_URL = 'localhost';
 
@@ -32,11 +41,17 @@ client.on('close', mqtt_close);
 
 function mqtt_connect() {
     console.log("Connecting MQTT");
-    client.subscribe(Topic, mqtt_subscribe);
+	client.subscribe(Topic, mqtt_subscribe);
+	client.subscribe(Topic_2, mqtt_subscribe_2);
 };
 
 function mqtt_subscribe(err, granted) {
     console.log("Subscribed to " + Topic);
+    if (err) {console.log(err);}
+};
+
+function mqtt_subscribe_2(err, granted) {
+    console.log("Subscribed to " + Topic_2);
     if (err) {console.log(err);}
 };
 
@@ -64,10 +79,27 @@ function mqtt_messsageReceived(topic, message, packet) {
 	// 	var device_id = value_mes[i]['device_id'];
 	// 	console.log(device_id);
 	// }
+	// sua cho nay---------------------------------------------------------
+	console.log(value_mes);
+	latestData = value_mes;
+	// sua cho nay---------------------------------------------------------
 	insert_message(topic, value_mes, packet);
-
+	check_message(topic, value_mes, packet);
+	//console.log(Math.floor(Math.random() * 10) + 1);
 
 };
+
+// sua cho nay---------------------------------------------------------
+//latestData = mqtt_messsageReceived();
+io.on('connection', function(socket){
+	socket.emit('data', latestData);
+})
+
+setInterval(function(){
+	io.emit('data',latestData);
+	console.log('Last updated: ' + latestData);
+}, 3000);
+// sua cho nay---------------------------------------------------------
 
 function mqtt_close() {
 	console.log("Close MQTT");
@@ -91,29 +123,24 @@ pool.getConnection(function(err, connection){
 function insert_message(topic, value_mes, packet) {
 	pool.getConnection(function(err, connection){
 		// console.log('Database connected!')
+		//console.log(value_mes);
+		var sql, value_1, value_2, params, device_id;
+		//console.log(value_mes.length);
 		for (var i = 0; i < value_mes.length; i++) {
-			var sql = "INSERT INTO ?? (??,??,??,??) VALUES (?,?,?,?)";
-			var device_id = value_mes[i]['device_id'];
-
-			var value_1, value_2;
-			value_1 = value_mes[i]['value'][0];
-			value_2 = value_mes[i]['value'][1];
-
-			// var value;
-			// if (value_mes[i].value.length > 1)
-			// {
-			// 	value = value_mes[i]['value'][0] + "-" + value_mes[i]['value'][1];
-			// }
-			// else
-			// {
-			// 	value = value_mes[i]['value'];
-			// }
-
-
-			// console.log(value_mes[i]['value'][0]);
-			// console.log(device_id);
-			// console.log(value);
-			var params = ['MQTT', 'device_id', 'temp', 'topic', 'humid', device_id, value_1, topic, value_2];
+			device_id = value_mes[i]['device_id'];
+			if(value_mes[i]['values'].length > 1)
+			{
+				sql = "INSERT INTO ?? (??,??,??,??) VALUES (?,?,?,?)";
+				value_1 = value_mes[i]['values'][0];
+				value_2 = value_mes[i]['values'][1];
+				params = ['mqtt_temp', 'device_id', 'temp', 'topic', 'humid', device_id, value_1, topic, value_2];
+			}
+			else if(value_mes[i]['values'].length == 1)
+			{
+				sql = "INSERT INTO ?? (??,??,??) VALUES (?,?,?)";
+				value_1 = value_mes[i]['values'][0];
+				params = ['mqtt_light', 'device_id', 'color', 'topic', device_id, value_1, topic];
+			}
 			sql = mysql.format(sql, params);
 			connection.query(sql, function (error, results) {
 				if (error) throw error;
@@ -123,17 +150,74 @@ function insert_message(topic, value_mes, packet) {
 	})
 };	
 
+function check_message(topic, value_mes, packet) {
+		// console.log('Database connected!')
+		// console.log(value_mes);
+		var value_1, value_2, value_3, device_id;
+		device_id = "LightD";
+		value_3 = 1;
+		var color;
+		for (var i = 0; i < value_mes.length; i++) {
+			if(value_mes[i]['values'].length > 1)
+			{
+				value_1 = value_mes[i]['values'][0];
+				value_2 = value_mes[i]['values'][1];
+			}
+			else if(value_mes[i]['values'].length == 1)
+			{
+				value_1 = value_mes[i]['values'][0];
+			}
+		}
 
-app.get("/", function(req, res){
-    res.render("main");
-})
+		if(value_1 < 10)
+		{
+			color = 222;
+		}
+		if(value_1 > 11 && value_1 < 25)
+		{
+			color = 166;
+		}
+		else if(value_1 > 25)
+		{
+			color = 77;
+		}
+
+		var str = [{device_id: device_id.toString() ,values: [value_3.toString(), color.toString()]}];
+		var message = JSON.stringify(str);
+		if (client.connected == true){
+			client.publish(topic_light, message);
+			// console.log("sent");
+		}
+		// console.log(message);
+
+};	
+
+
+// app.get("/", function(req, res){
+//     res.render("main");
+// })
+
+app.get("/home",function(req,res){
+	pool.getConnection(function(err,connection){
+	if (err) throw err;
+	
+		connection.query('SELECT * FROM web_test.mqtt_temp ORDER BY id ASC', function(error, results, fields){
+			connection.release();
+			if (error) {
+				res.end();
+				throw error;
+			}	
+			res.render("main.ejs", { danhsach: results });
+		})
+	})
+});
 
 app.get("/list", function(req, res){
     pool.getConnection(function(err, connection) {
         if (err) throw err; // not connected!
       
         // Use the connection
-        connection.query('SELECT * FROM web_test.MQTT ORDER BY id ASC', function (error, results, fields) {
+        connection.query('SELECT * FROM web_test.mqtt_temp ORDER BY id ASC', function (error, results, fields) {
           // When done with the connection, release it.
             connection.release();
       
@@ -155,6 +239,8 @@ app.get("/public", function(req, res){
     // show form
     res.render("public.ejs")
 });
+
+
 
 app.post("/public", urlencodedParser, function(req, res){
     var device_id = req.body.txtID.toString();
