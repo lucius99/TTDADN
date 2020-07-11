@@ -1,0 +1,57 @@
+@charset "utf-8";
+body{ 
+	margin: 0px;
+}
+#id_bg{
+	width: 100vw;
+	height: 100vh;
+	background-image: url('../img/log_screen.jpg');
+	background-size:cover;
+	background-repeat:no-repeat;
+	opacity: 70%;
+	position:fixed;
+}
+#id_form{
+	min-width: 200px;
+	width: 20vw;
+	height: 50vh;
+	margin-left: 40vw;
+	margin-top: 25vh;
+	background-color:#F93;
+	border:solid #000 1px;
+	border-radius: 5px;
+	box-shadow:3px 3px 2px #FFF;
+}
+#id_titleForm{
+	height: 40px;
+	border-bottom:solid #000 1px;
+	text-align:center;
+	padding-top: 12px;
+	font-size:25px;
+	font-style:oblique;
+}
+#id_inText{
+	display:block;
+	width:200px;
+	height: 20px;
+	margin-left: 22px;
+	margin-top: 40px
+}
+#id_inPass{
+	display:block;
+	width:200px;
+	height: 20px;
+	margin-left: 22px;
+	margin-top: 30px
+}
+#id_inBtn{
+	height:auto;
+	padding: 10px;
+	display:block;
+	border-radius: 10px;
+	margin-left:80px;
+	margin-top: 50px
+}
+#id_inBtn:hover{
+	background-color:#999;
+}
