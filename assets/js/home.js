@@ -155,14 +155,14 @@
 
   $("#id_range_min_tem").on("input change", function(){
     $("#min_tem_value").html($("#id_range_min_tem").val());
-    $("#id_range_max_tem").attr("min", $("#id_range_min_tem").val());
+    // $("#id_range_max_tem").attr("min", $("#id_range_min_tem").val());
   });
   $("#id_range_max_tem").on("input change", function(){
     $("#max_tem_value").html($("#id_range_max_tem").val());
   });
   $("#id_range_min_hum").on("input change", function(){
     $("#min_hum_value").html($("#id_range_min_hum").val());
-    $("#id_range_max_hum").attr("min", $("#id_range_min_hum").val());
+    // $("#id_range_max_hum").attr("min", $("#id_range_min_hum").val());
   });
   $("#id_range_max_hum").on("input change", function(){
     $("#max_hum_value").html($("#id_range_max_hum").val());

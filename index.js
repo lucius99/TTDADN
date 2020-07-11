@@ -208,7 +208,7 @@ app.get("/home",function(req,res){
 				res.end();
 				throw error;
 			}	
-			res.render('home.ejs');
+			res.render('home.ejs', {danhsach: results});
 		})
 	})
 });

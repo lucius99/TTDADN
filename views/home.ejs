@@ -14,6 +14,7 @@
   <!-- <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon"> -->
 
   <!-- Vendor CSS Files -->
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
   <link href="/public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
   <link href="/public/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
   <link href="/public/vendor/ionicons/css/ionicons.min.css" rel="stylesheet" type="text/css">
@@ -29,6 +30,17 @@
   * Author: BootstrapMade.com
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
+
+  <!-- BackEnd in MQTT -->
+  <script src="socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrender/0.9.90/jsrender.min.js"></script>
+
+  <script>
+      var socket = io("http://localhost:3000");
+  </script>
+
+  <!-- BackEnd in MQTT -->
 </head>
 
 <body id="page-top">
@@ -74,17 +86,49 @@
           
           <div id="id_tem_form" class="class_term_form">
             <div class="class_tittle">Temperature</div>
-            <div id="id_tem" class="class_temhum"><b>37 celsius</b></div>
+            <div id="id_tem" class="class_temhum">
+              <!-- <b>50 percent</b> -->
+              <b>
+                <div id="data1"></div>
+                  <script id="Temparature" type="text/x-jsrender">
+                      {{:values[0]}}
+                  </script>
+              </b>
+            </div>
           </div>
           <div id="id_hum_form" class="class_hum_form">
             <div class="class_tittle">Humidity</div>
-            <div id="id_hum" class="class_temhum"><b>50 percent</b></div>
+            <div id="id_hum" class="class_temhum">
+              <!-- <b>50 percent</b> -->
+              <b>
+                <div id="data2"></div> 
+                  <script id="Humidity" type="text/x-jsrender">
+                      {{:values[1]}}
+                  </script>
+              </b>
+            </div>
           </div>
 
         </div>
       </div>
     </div>
   </div><!-- End Display Section -->
+
+  <!-- Script to print value -->
+  <script>
+    var socket = io();
+    var tmpl1 = $.templates("#Temparature");
+    var tmpl2 = $.templates("#Humidity");
+
+    socket.on('data', function (data) {
+        // console.log(data);
+        $('#data1').html(tmpl1.render(data));
+        $('#data2').html(tmpl2.render(data));
+    });
+
+  </script>
+  <!-- Script to print value -->
+
 
   <main id="main">
 
@@ -107,19 +151,42 @@
               <div class="container">
                 <div class="row">
                   <div class="col-sm-6">
-                    <h3 class="s-title">Min tempetature: <span class="class_value" id="min_tem_value">0</span></h3>
+                    <h3 class="s-title">Min tempetature: <span class="class_value" id="min_tem_value">50</span></h3>
                     <input type="range" id="id_range_min_tem" class="ranges"  min="-50" max="150" step=0.1>
-                    <h3 class="s-title">Max tempetature: <span class="class_value" id="max_tem_value">100</span></h3>
+                    <h3 class="s-title">Max tempetature: <span class="class_value" id="max_tem_value">50</span></h3>
                     <input type="range" id="id_range_max_tem" class="ranges" min="-50" max="150" step=0.1>
                   </div>
                   <div class="col-sm-6">
-                    <h3 class="s-title">Min humidity: <span class="class_value" id="min_hum_value">0</span></h3>
+                    <h3 class="s-title">Min humidity: <span class="class_value" id="min_hum_value">50</span></h3>
                     <input type="range" id="id_range_min_hum" class="ranges"  min="0" max="100" step=0.1>
-                    <h3 class="s-title">Max humidity: <span class="class_value" id="max_hum_value">100</span></h3>
+                    <h3 class="s-title">Max humidity: <span class="class_value" id="max_hum_value">50</span></h3>
                     <input type="range" id="id_range_max_hum" class="ranges"  min="0" max="100" step=0.1>
                   </div>
                 </div>
               </div>
+              <script type="text/javascript">
+                var elementMinTemp = document.getElementById('min_tem_value');
+                var elementMaxTemp = document.getElementById('max_tem_value');
+                
+                var minTemp;
+                var maxTemp;
+                setInterval(function(){
+                  minTemp = elementMinTemp.innerHTML;
+                  maxTemp = elementMaxTemp.innerHTML;
+                  
+                  console.log("Min Temp: " + minTemp);
+                  console.log("Max Temp: " + maxTemp);
+                }, 3000);
+
+                setInterval(function(){
+                  minTemp = elementMinTemp.innerHTML;
+                  maxTemp = elementMaxTemp.innerHTML;
+                  if (minTemp > maxTemp)
+                  {
+                    alert("ngu");
+                  }
+                }, 3000);
+              </script>
               
             </div>
           </div>
