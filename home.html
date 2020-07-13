@@ -29,17 +29,17 @@
   * Author: BootstrapMade.com
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
-  
-    <!-- BackEnd in MQTT -->
-  <script src="socket.io/socket.io.js"></script>
+
+  <!-- BackEnd in MQTT -->
+  <!-- <script src="socket.io/socket.io.js"></script> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrender/0.9.90/jsrender.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"> </script>
+  <!-- <script>
+    var socket = io("http://localhost:3000");
+  </script> -->
 
-  <script>
-      var socket = io("http://localhost:3000");
-  </script>
-
-    <!-- BackEnd in MQTT -->
+  <!-- BackEnd in MQTT -->
 
 </head>
 
@@ -48,7 +48,8 @@
   <nav class="navbar navbar-b navbar-trans navbar-expand-md fixed-top" id="mainNav">
     <div class="container">
       <a class="navbar-brand js-scroll" href="#page-top">eStore</a>
-      <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarDefault" aria-controls="navbarDefault" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarDefault"
+        aria-controls="navbarDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span></span>
         <span></span>
         <span></span>
@@ -83,7 +84,7 @@
     <div class="intro-content display-table">
       <div class="table-cell">
         <div class="container">
-          
+
           <div id="id_tem_form" class="class_term_form">
             <div class="class_tittle">Temperature</div>
             <div id="id_tem" class="class_temhum"><b>37 celsius</b></div>
@@ -115,24 +116,24 @@
         <div class="row">
           <div class="col-sm-12">
             <div class="box-shadow-full">
-              
+
               <div class="container">
                 <div class="row">
                   <div class="col-sm-6">
                     <h3 class="s-title">Min tempetature: <span class="class_value" id="min_tem_value">0</span></h3>
-                    <input type="range" id="id_range_min_tem" class="ranges"  min="-50" max="150" step=0.1>
+                    <input type="range" id="id_range_min_tem" class="ranges" min="-50" max="150" step=0.1>
                     <h3 class="s-title">Max tempetature: <span class="class_value" id="max_tem_value">100</span></h3>
                     <input type="range" id="id_range_max_tem" class="ranges" min="-50" max="150" step=0.1>
                   </div>
                   <div class="col-sm-6">
                     <h3 class="s-title">Min humidity: <span class="class_value" id="min_hum_value">0</span></h3>
-                    <input type="range" id="id_range_min_hum" class="ranges"  min="0" max="100" step=0.1>
+                    <input type="range" id="id_range_min_hum" class="ranges" min="0" max="100" step=0.1>
                     <h3 class="s-title">Max humidity: <span class="class_value" id="max_hum_value">100</span></h3>
-                    <input type="range" id="id_range_max_hum" class="ranges"  min="0" max="100" step=0.1>
+                    <input type="range" id="id_range_max_hum" class="ranges" min="0" max="100" step=0.1>
                   </div>
                 </div>
               </div>
-              
+
             </div>
           </div>
         </div>
@@ -154,10 +155,48 @@
         <div class="row">
           <div class="col-md-6">
             <div class="service-box">
-              <canvas id="id_temChart" class="charts"></canvas>
-              
+              <canvas id="id_temChart" class="charts" width="400" height="400"></canvas>
             </div>
           </div>
+          <script>
+            var ctx = document.getElementById('id_temChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                datasets: [{
+                  label: '# of Votes',
+                  data: [12, 19, 3, 5, 2, 3],
+                  backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                  ],
+                  borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                  ],
+                  borderWidth: 1
+                }]
+              },
+              options: {
+                scales: {
+                  yAxes: [{
+                    ticks: {
+                      beginAtZero: true
+                    }
+                  }]
+                }
+              }
+            });
+          </script>
           <div class="col-md-6">
             <div class="service-box">
               <canvas id="id_humChart" class="charts"></canvas>
@@ -187,25 +226,29 @@
                         <div class="row">
                           <div class="col-md-12 mb-3">
                             <div class="form-group">
-                              <input type="text" name="name" class="form-control" id="name" placeholder="Your Name" data-rule="minlen:4" data-msg="Please enter at least 4 chars" />
+                              <input type="text" name="name" class="form-control" id="name" placeholder="Your Name"
+                                data-rule="minlen:4" data-msg="Please enter at least 4 chars" />
                               <div class="validate"></div>
                             </div>
                           </div>
                           <div class="col-md-12 mb-3">
                             <div class="form-group">
-                              <input type="email" class="form-control" name="email" id="email" placeholder="Your Email" data-rule="email" data-msg="Please enter a valid email" />
+                              <input type="email" class="form-control" name="email" id="email" placeholder="Your Email"
+                                data-rule="email" data-msg="Please enter a valid email" />
                               <div class="validate"></div>
                             </div>
                           </div>
                           <div class="col-md-12 mb-3">
                             <div class="form-group">
-                              <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject" data-rule="minlen:4" data-msg="Please enter at least 8 chars of subject" />
+                              <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject"
+                                data-rule="minlen:4" data-msg="Please enter at least 8 chars of subject" />
                               <div class="validate"></div>
                             </div>
                           </div>
                           <div class="col-md-12">
                             <div class="form-group">
-                              <textarea class="form-control" name="message" rows="5" data-rule="required" data-msg="Please write something for us" placeholder="Message"></textarea>
+                              <textarea class="form-control" name="message" rows="5" data-rule="required"
+                                data-msg="Please write something for us" placeholder="Message"></textarea>
                               <div class="validate"></div>
                             </div>
                           </div>
@@ -229,12 +272,14 @@
                     </div>
                     <div class="more-info">
                       <p class="lead">
-                        eStore – Monitoring system of temperature and humidity in storage. We are happy and willing to serve you.
+                        eStore – Monitoring system of temperature and humidity in storage. We are happy and willing to
+                        serve you.
                       </p>
                       <ul class="list-ico">
-                        <li><span class="ion-ios-location"></span>  Ho Chi Minh City University of Technology (HCMUT)</li>
-                        <li><span class="ion-ios-telephone"></span>  (+84) 336482038</li>
-                        <li><span class="ion-email"></span>  huy.nguyenxuan@hcmut.edu.vn</li>
+                        <li><span class="ion-ios-location"></span> Ho Chi Minh City University of Technology (HCMUT)
+                        </li>
+                        <li><span class="ion-ios-telephone"></span> (+84) 336482038</li>
+                        <li><span class="ion-email"></span> huy.nguyenxuan@hcmut.edu.vn</li>
                       </ul>
                     </div>
                   </div>
