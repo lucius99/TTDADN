@@ -1,7 +1,7 @@
 var express = require("express");
 var app = express()
 var bodyParser = require('body-parser')
-var urlencodedParser = bodyParser.urlencoded({ extended: false })
+var urlencodedParser = bodyParser.urlencoded({ extended: true })
 var path = require('path');
 let morgan = require('morgan');//--------------------------------------
 let nodeXlsx = require('node-xlsx');//--------------------------------------
@@ -20,12 +20,14 @@ var server = require("http").Server(app);
 var io = require("socket.io")(server);
 server.listen(3000);
 var latestData;
+var minTemp, maxTemp;
 // sua cho nay---------------------------------------------------------
 
 var topic_light = "Topic/LightD";
 var Topic = 'mqttbox/temp';
 var Topic_2 = 'mqttbox/light'; //subscribe to all topics
 var Broker_URL = 'mqtt://13.75.111.201:1883';
+var light_id = "LightD";
 var Database_URL = 'localhost';
 
 // MQTT
@@ -77,27 +79,16 @@ function after_publish() {
 	//do nothing
 };
 
-//receive a message from MQTT broker
+var minTemp = 10;
+var maxTemp = 20;
 function mqtt_messsageReceived(topic, message, packet) {
 	var value_mes = JSON.parse(message.toString());
-	// console.log(value_mes);
-	// console.log(topic);
-	// for (var i = 0; i < value_mes.length; i++) {
-	// 	var device_id = value_mes[i]['device_id'];
-	// 	console.log(device_id);
-	// }
-	// sua cho nay---------------------------------------------------------
 	console.log(value_mes);
 	latestData = value_mes;
-	// sua cho nay---------------------------------------------------------
 	insert_message(topic, value_mes, packet);
-	check_message(topic, value_mes, packet);
-	//console.log(Math.floor(Math.random() * 10) + 1);
-
+	check_message(value_mes, minTemp,maxTemp);
 };
 
-// sua cho nay---------------------------------------------------------
-//latestData = mqtt_messsageReceived();
 io.on('connection', function (socket) {
 	socket.emit('data', latestData);
 })
@@ -106,7 +97,6 @@ setInterval(function () {
 	io.emit('data', latestData);
 	console.log('Last updated: ' + latestData);
 }, 3000);
-// sua cho nay---------------------------------------------------------
 
 function mqtt_close() {
 	console.log("Close MQTT");
@@ -126,77 +116,59 @@ pool.getConnection(function (err, connection) {
 	console.log('Database connected!')
 })
 
-
 function insert_message(topic, value_mes, packet) {
 	pool.getConnection(function (err, connection) {
 		// console.log('Database connected!')
 		//console.log(value_mes);
 		var sql, value_1, value_2, params, device_id;
-		//console.log(value_mes.length);
-		for (var i = 0; i < value_mes.length; i++) {
-			device_id = value_mes[i]['device_id'];
-			if (value_mes[i]['values'].length > 1) {
-				sql = "INSERT INTO ?? (??,??,??,??) VALUES (?,?,?,?)";
-				value_1 = value_mes[i]['values'][0];
-				value_2 = value_mes[i]['values'][1];
-				params = ['mqtt', 'device_id', 'temp', 'topic', 'humid', device_id, value_1, topic, value_2];
-			}
-			else if (value_mes[i]['values'].length == 1) {
-				sql = "INSERT INTO ?? (??,??,??) VALUES (?,?,?)";
-				value_1 = value_mes[i]['values'][0];
-				params = ['mqtt_light', 'device_id', 'color', 'topic', device_id, value_1, topic];
-			}
-			sql = mysql.format(sql, params);
-			connection.query(sql, function (error, results) {
-				if (error) throw error;
-				console.log("Message added: ");
-			});
-		}
+		device_id = value_mes[0]['device_id'];
+		sql = "INSERT INTO ?? (??,??,??,??) VALUES (?,?,?,?)";
+		value_1 = value_mes[0]['values'][0];
+		value_2 = value_mes[0]['values'][1];
+		params = ['mqtt', 'device_id', 'temp', 'topic', 'humid', device_id, value_1, topic, value_2];
+		// else if (value_mes[i]['values'].length == 1) {
+		// 	sql = "INSERT INTO ?? (??,??,??) VALUES (?,?,?)";
+		// 	value_1 = value_mes[i]['values'][0];
+		// 	params = ['mqtt_light', 'device_id', 'color', 'topic', device_id, value_1, topic];
+		// }
+		sql = mysql.format(sql, params);
+		connection.query(sql, function (error, results) {
+			if (error) throw error;
+			console.log("Message added: ");
+		});
+
 	})
 };
 
-function check_message(topic, value_mes, packet) {
-	// console.log('Database connected!')
-	// console.log(value_mes);
-	var value_1, value_2, value_3, device_id;
-	device_id = "LightD";
-	value_3 = 1;
+//receive a message from MQTT broker
+function check_message(value_mes, minTemp, maxTemp) {
+	var value_1, value_2, device_id;
+	device_id = light_id;
+	value_2 = 1;
 	var color;
-	for (var i = 0; i < value_mes.length; i++) {
-		if (value_mes[i]['values'].length > 1) {
-			value_1 = value_mes[i]['values'][0];
-			value_2 = value_mes[i]['values'][1];
-		}
-		else if (value_mes[i]['values'].length == 1) {
-			value_1 = value_mes[i]['values'][0];
-		}
-	}
-
-	if (value_1 <= 10) {
+	value_1 = value_mes[0]['values'][0];
+	//value_2 = value_mes[i]['values'][1];
+	
+	if (value_1 <= minTemp) {
+		console.log(minTemp);
 		color = 222;
 	}
-	if (value_1 >= 11 && value_1 <= 25) {
+	else if (value_1 > minTemp && value_1 <= maxTemp) {
 		color = 166;
+		console.log(maxTemp);
 	}
-	else if (value_1 > 25) {
+	else{
+		console.log(value_1);
 		color = 77;
 	}
-
-	var str = [{ device_id: device_id.toString(), values: [value_3.toString(), color.toString()] }];
+		
+	var str = [{ device_id: device_id.toString(), values: [value_2.toString(), color.toString()] }];
 	var message = JSON.stringify(str);
 	if (client.connected == true) {
 		client.publish(topic_light, message);
-		// console.log("sent");
 	}
-	// console.log(message);
-
 };
-
-
-// app.get("/", function(req, res){
-//     res.render("main");
-// })
-
+var message;
 app.get("/home", function (req, res) {
 	pool.getConnection(function (err, connection) {
 		if (err) throw err;
@@ -205,8 +177,18 @@ app.get("/home", function (req, res) {
 			if (error) {
 				res.end();
 				throw error;
-			}			
-			res.render('home.ejs', { danhsach: results });			
+			}
+			var len = results.length - 1;
+			var temp = results[len].temp;
+			var humid = results[len].humid;
+			var device_id = results[len].device_id;
+			var str = [{ device_id: device_id.toString(), values: [temp.toString(), humid.toString()] }];
+			message = JSON.stringify(str);
+
+			if (client.connected == true) {
+				client.publish(Topic, message);
+			}
+			res.render('home.ejs', { danhsach: results });
 		})
 	})
 });
@@ -233,13 +215,10 @@ app.get("/list", function (req, res) {
 	});
 });
 
-
 app.get("/public", function (req, res) {
 	// show form
 	res.render("public.ejs")
 });
-
-
 
 app.post("/public", urlencodedParser, function (req, res) {
 	var device_id = req.body.txtID.toString();
@@ -247,7 +226,7 @@ app.post("/public", urlencodedParser, function (req, res) {
 	var value_2 = req.body.txtValue_2
 	var topic = req.body.txtTopic;
 
-	var str = [{ device_id: device_id.toString(), value: [value_1.toString(), value_2.toString()] }];
+	var str = [{ device_id: device_id.toString(), values: [value_1.toString(), value_2.toString()] }];
 	// console.log(str);
 	var message = JSON.stringify(str);
 	console.log(message);
@@ -290,7 +269,7 @@ app.get("/export-download", function (req, res) {
 					//console.log(row[key]);
 					rowItemValue.push(row[key]);
 				});
-				
+
 				dataExcel.push(rowItemValue);
 				console.log(dataExcel);
 			});
@@ -299,5 +278,12 @@ app.get("/export-download", function (req, res) {
 			res.send(buffer);
 		});
 	});
+});
+
+app.post("/home", urlencodedParser, function (req, res) {
+	minTemp = req.body.txtMinTemp;
+	//console.log(minTemp);
+	maxTemp = req.body.txtMaxTemp;
+	//console.log(maxTemp);
 });
 

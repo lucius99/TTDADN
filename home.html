@@ -113,30 +113,43 @@
             </div>
           </div>
         </div>
-        <div class="row">
-          <div class="col-sm-12">
-            <div class="box-shadow-full">
+        <form action="" method = "POST" enctype = "application/x-www-form-urlencoded">
 
-              <div class="container">
-                <div class="row">
-                  <div class="col-sm-6">
-                    <h3 class="s-title">Min tempetature: <span class="class_value" id="min_tem_value">0</span></h3>
-                    <input type="range" id="id_range_min_tem" class="ranges" min="-50" max="150" step=0.1>
-                    <h3 class="s-title">Max tempetature: <span class="class_value" id="max_tem_value">100</span></h3>
-                    <input type="range" id="id_range_max_tem" class="ranges" min="-50" max="150" step=0.1>
-                  </div>
-                  <div class="col-sm-6">
-                    <h3 class="s-title">Min humidity: <span class="class_value" id="min_hum_value">0</span></h3>
-                    <input type="range" id="id_range_min_hum" class="ranges" min="0" max="100" step=0.1>
-                    <h3 class="s-title">Max humidity: <span class="class_value" id="max_hum_value">100</span></h3>
-                    <input type="range" id="id_range_max_hum" class="ranges" min="0" max="100" step=0.1>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="box-shadow-full">
+
+                <div class="container">
+                  <div class="row">
+
+                    <div class="col-sm-6">
+                      <h3 class="s-title">Min tempetature: <span class="class_value" id="min_tem_value">0</span></h3>
+                      <input type="range" id="id_range_min_tem" class="ranges" min="-50" max="150" step=0.1>
+                      <h3 class="s-title">Max tempetature: <span class="class_value" id="max_tem_value">100</span></h3>
+                      <input type="range" id="id_range_max_tem" class="ranges" min="-50" max="150" step=0.1>
+                    </div>
+
+                    <div class="col-sm-6">
+                      <h3 class="s-title">Min humidity: <span class="class_value" id="min_hum_value">0</span></h3>
+                      <input type="range" id="id_range_min_hum" class="ranges" min="0" max="100" step=0.1>
+                      <h3 class="s-title">Max humidity: <span class="class_value" id="max_hum_value">100</span></h3>
+                      <input type="range" id="id_range_max_hum" class="ranges" min="0" max="100" step=0.1>
+                    </div>
+
+
                   </div>
                 </div>
+                <div class="row">
+                  <div class="col-sm-6">
+                    <input type = "submit" name = "btnThem" value = "Set" />
+                  </div>
+                  
+                </div>
+                
               </div>
-
             </div>
           </div>
-        </div>
+        </form>
       </div>
     </section><!-- End Setting Section -->
 
