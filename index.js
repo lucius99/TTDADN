@@ -86,7 +86,7 @@ function mqtt_messsageReceived(topic, message, packet) {
 	console.log(value_mes);
 	latestData = value_mes;
 	insert_message(topic, value_mes, packet);
-	check_message(value_mes, minTemp,maxTemp);
+	check_message(topic, value_mes, packet);
 };
 
 io.on('connection', function (socket) {
@@ -141,7 +141,7 @@ function insert_message(topic, value_mes, packet) {
 };
 
 //receive a message from MQTT broker
-function check_message(value_mes, minTemp, maxTemp) {
+function check_message(topic, value_mes, packet) {
 	var value_1, value_2, device_id;
 	device_id = light_id;
 	value_2 = 1;

@@ -162,20 +162,21 @@
 
                 <div class="container">
                   <div class="row">
-                    <div class="col-sm-6">
-                      <h3 class="s-title">Min tempetature: <span class="class_value" id="min_tem_value">50</span></h3>
-                      <input type="range" id="id_range_min_tem" name="txtMinTemp" class="ranges" min="-50" max="150"
-                        step=0.1>
-                      <h3 class="s-title">Max tempetature: <span class="class_value" id="max_tem_value">50</span></h3>
-                      <input type="range" id="id_range_max_tem" name="txtMaxTemp" class="ranges" min="-50" max="150"
-                        step=0.1>
-                    </div>
-                    <div class="col-sm-6">
+                    <!-- <div class="col-sm-6"> -->
+                      
+                    <h3 class="s-title">Min tempetature: <span class="class_value" id="min_tem_value">50</span></h3>
+                    <input type="range" id="id_range_min_tem" name="txtMinTemp" class="ranges" min="-50" max="150"
+                      step=0.1>
+                    <h3 class="s-title">Max tempetature: <span class="class_value" id="max_tem_value">50</span></h3>
+                    <input type="range" id="id_range_max_tem" name="txtMaxTemp" class="ranges" min="-50" max="150"
+                      step=0.1>
+                    <!-- </div> -->
+                    <!-- <div class="col-sm-6">
                       <h3 class="s-title">Min humidity: <span class="class_value" id="min_hum_value">50</span></h3>
                       <input type="range" id="id_range_min_hum" class="ranges" min="0" max="100" step=0.1>
                       <h3 class="s-title">Max humidity: <span class="class_value" id="max_hum_value">50</span></h3>
                       <input type="range" id="id_range_max_hum" class="ranges" min="0" max="100" step=0.1>
-                    </div>
+                    </div> -->
                   </div>
                   <input type="submit" name="btnThem2" value="Set" />
                 </div>
@@ -201,7 +202,7 @@
           maxTemp = elementMaxTemp.innerHTML;
           if (minTemp > maxTemp && i == 1) {
             i = 0;
-            alert("Nhiệt độ thấp nhất không được thấp hơn nhiệt độ cao nhất");
+            alert("Nhiệt độ thấp nhất không được cao hơn nhiệt độ cao nhất");
           }
         }, 1000);
 
@@ -387,10 +388,6 @@
         </div>
       </div>
     </section><!-- End Contact Section -->
-    <form action="" method="POST" enctype="application/x-www-form-urlencoded">
-      <input type="range" id="id_range_min_hum" name="txtMinTemp1" class="ranges" min="0" max="100" step=0.1>
-      <input type="submit" name="btnThem" value="Set" />
-    </form>
   </main><!-- End #main -->
 
 
