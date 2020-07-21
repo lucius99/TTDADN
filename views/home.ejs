@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>eStore</title>
+  <meta content="" name="descriptison">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="/public/img/icon_title.JPG" rel="icon">
+  <!-- <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon"> -->
+
+  <!-- Vendor CSS Files -->
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
+  <link href="/public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+  <link href="/public/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link href="/public/vendor/ionicons/css/ionicons.min.css" rel="stylesheet" type="text/css">
+  <link href="/public/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet" type="text/css">
+  <link href="/public/vendor/venobox/venobox.css" rel="stylesheet" type="text/css">
+
+  <!-- Template Main CSS File -->
+  <link href="/public/css/home.css" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: DevFolio - v2.3.0
+  * Template URL: https://bootstrapmade.com/devfolio-bootstrap-portfolio-html-template/
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+
+  <!-- BackEnd in MQTT -->
+  <script src="socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrender/0.9.90/jsrender.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"> </script>
+  <script>
+    var socket = io("http://localhost:3000");
+  </script>
+
+  <!-- BackEnd in MQTT -->
+</head>
+
+<body id="page-top">
+  <!-- ======= Header/ Navbar ======= -->
+  <nav class="navbar navbar-b navbar-trans navbar-expand-md fixed-top" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand js-scroll" href="#page-top">eStore</a>
+      <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarDefault"
+        aria-controls="navbarDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="navbar-collapse collapse justify-content-end" id="navbarDefault">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link js-scroll active" href="#page-top">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll" href="#setting">Setting</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll" href="#charts">Charts</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll" href="/export-download">Export</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll" href="#logout" id="id_logout">Logout</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll" href="#contact">Contact</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ======= Display Section ======= -->
+  <div id="home" class="intro route " style="background-color:#000033;">
+    <div class="intro-content display-table">
+      <div class="table-cell">
+        <div class="container">
+
+          <div id="id_tem_form" class="class_term_form">
+            <div class="class_tittle">Temperature</div>
+            <div id="id_tem" class="class_temhum">
+              <!-- <b>50 percent</b> -->
+              <b>
+                <div id="data1"></div>
+                <script id="Temparature" type="text/x-jsrender">
+                      {{:values[0]}}
+                  </script>
+              </b>
+            </div>
+          </div>
+          <div id="id_hum_form" class="class_hum_form">
+            <div class="class_tittle">Humidity</div>
+            <div id="id_hum" class="class_temhum">
+              <!-- <b>50 percent</b> -->
+              <b>
+                <div id="data2"></div>
+                <script id="Humidity" type="text/x-jsrender">
+                      {{:values[1]}}
+                  </script>
+              </b>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div><!-- End Display Section -->
+
+  <!-- Script to print value -->
+  <script>
+    var socket = io();
+    var tmpl1 = $.templates("#Temparature");
+    var tmpl2 = $.templates("#Humidity");
+
+    socket.on('data', function (data) {
+      // console.log(data);
+      $('#data1').html(tmpl1.render(data));
+      $('#data2').html(tmpl2.render(data));
+    });
+
+  </script>
+  <!-- Script to print value -->
+
+  <input id="EJSData" value="<%= JSON.stringify(danhsach) %>" />
+  <script id="EJSDataLoader">
+    (() => {
+      let ejsDataElm = document.getElementById("EJSData");
+      let scElm = document.createElement("script");
+      scElm.innerHTML = `const EJSData = ()=>{return ${ejsDataElm.value}}`;
+      document.body.appendChild(scElm);
+      document.body.removeChild(document.getElementById("EJSData"));
+      document.body.removeChild(document.getElementById("EJSDataLoader"));
+    })();
+  </script>
+  <main id="main">
+
+    <!-- ======= Setting Section ======= -->
+    <section id="setting" class="about-mf sect-pt4 route">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="title-box text-center">
+              <h3 class="title-a">
+                Setting
+              </h3>
+            </div>
+          </div>
+        </div>
+        <form action="" method="POST" enctype="application/x-www-form-urlencoded">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="box-shadow-full">
+
+                <div class="container">
+                  <div class="row">
+                    <!-- <div class="col-sm-6"> -->
+                      
+                    <h3 class="s-title">Min tempetature: <span class="class_value" id="min_tem_value">50</span></h3>
+                    <input type="range" id="id_range_min_tem" name="txtMinTemp" class="ranges" min="-50" max="150"
+                      step=0.1>
+                    <h3 class="s-title">Max tempetature: <span class="class_value" id="max_tem_value">50</span></h3>
+                    <input type="range" id="id_range_max_tem" name="txtMaxTemp" class="ranges" min="-50" max="150"
+                      step=0.1>
+                    <!-- </div> -->
+                    <!-- <div class="col-sm-6">
+                      <h3 class="s-title">Min humidity: <span class="class_value" id="min_hum_value">50</span></h3>
+                      <input type="range" id="id_range_min_hum" class="ranges" min="0" max="100" step=0.1>
+                      <h3 class="s-title">Max humidity: <span class="class_value" id="max_hum_value">50</span></h3>
+                      <input type="range" id="id_range_max_hum" class="ranges" min="0" max="100" step=0.1>
+                    </div> -->
+                  </div>
+                  <input type="submit" name="btnThem2" value="Set" />
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </form>
+      </div>
+      <script>
+        var elementMinTemp = document.getElementById('min_tem_value');
+        var elementMaxTemp = document.getElementById('max_tem_value');
+        var minTemp;
+        var maxTemp;
+        var i = 1;
+
+        setInterval(function () {
+          if (maxTemp > minTemp) {
+            i = 1;
+          }
+          minTemp = elementMinTemp.innerHTML;
+          maxTemp = elementMaxTemp.innerHTML;
+          if (minTemp > maxTemp && i == 1) {
+            i = 0;
+            alert("Nhiệt độ thấp nhất không được cao hơn nhiệt độ cao nhất");
+          }
+        }, 1000);
+
+      </script>
+    </section><!-- End Setting Section -->
+
+
+    <!-- ======= Charts Section ======= -->
+    <section id="charts" class="services-mf pt-5 route">
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="title-box text-center">
+              <h3 class="title-a">
+                Charts
+              </h3>
+            </div>
+          </div>
+        </div>
+        <div class="service-box">
+          <canvas id="id_temChart" class="charts" style="min-width: 400px; height: 400px; margin: 0 auto"></canvas>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="title-box text-center">
+                <h4 class="row col-sm-12 title-box text-center" style="display:inline;">
+                  Temparature
+                </h4>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="service-box">
+          <canvas id="id_humChart" class="charts" style="min-width: 310px; height: 400px; margin: 0 auto"></canvas>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="title-box text-center">
+                <h4 class="row col-sm-12 title-box text-center" style="display:inline;">
+                  Humidity
+                </h4>
+              </div>
+            </div>
+          </div>
+        </div>
+        <script type="text/javascript">
+          // console.log(EJSData().length);
+          let date = [];
+          let temp = [];
+          let humid = [];
+          for (let i = 0; i < EJSData().length; i++) {
+            date.push(EJSData()[i].date);
+            temp.push(EJSData()[i].temp);
+            humid.push(EJSData()[i].humid);
+          }
+          //console.log(data);
+          var ctx = document.getElementById('id_temChart').getContext('2d');
+
+          var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+
+              labels: date,
+              datasets: [{
+                label: 'Temparature',
+                data: temp,
+                backgroundColor: [
+                  'rgba(255, 99, 132, 0.2)'
+                ],
+                borderColor: [
+                  'rgba(0, 150, 255, 1)'
+                ],
+                borderCapStyle: 'butt',
+                borderWidth: 2
+              }]
+            }
+          });
+          var ctx2 = document.getElementById('id_humChart').getContext('2d');
+
+          var myChart2 = new Chart(ctx2, {
+            type: 'line',
+            data: {
+
+              labels: date,
+              datasets: [{
+                label: 'Humidity',
+                data: humid,
+                backgroundColor: [
+                  'rgba(255, 99, 132, 0.2)'
+                ],
+                borderColor: [
+                  'rgba(0, 150, 255, 1)'
+                ],
+                borderCapStyle: 'butt',
+                borderWidth: 2
+              }]
+            }
+          });
+
+        </script>
+      </div>
+    </section><!-- End Charts Section -->
+
+    <!-- ======= Contact Section ======= -->
+    <section class="paralax-mf bg-image sect-mt4 route" style="background-image: url(/public/img/overlay-bg.jpg)">
+      <div class="overlay-mf"></div>
+      <div class="container">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="contact-mf">
+              <div id="contact" class="box-shadow-full">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="title-box-2">
+                      <h5 class="title-left">
+                        Send Message Us
+                      </h5>
+                    </div>
+                    <div>
+                      <form action="forms/contact.php" method="post" role="form" class="php-email-form">
+                        <div class="row">
+                          <div class="col-md-12 mb-3">
+                            <div class="form-group">
+                              <input type="text" name="name" class="form-control" id="name" placeholder="Your Name"
+                                data-rule="minlen:4" data-msg="Please enter at least 4 chars" />
+                              <div class="validate"></div>
+                            </div>
+                          </div>
+                          <div class="col-md-12 mb-3">
+                            <div class="form-group">
+                              <input type="email" class="form-control" name="email" id="email" placeholder="Your Email"
+                                data-rule="email" data-msg="Please enter a valid email" />
+                              <div class="validate"></div>
+                            </div>
+                          </div>
+                          <div class="col-md-12 mb-3">
+                            <div class="form-group">
+                              <input type="text" class="form-control" name="subject" id="subject" placeholder="Subject"
+                                data-rule="minlen:4" data-msg="Please enter at least 8 chars of subject" />
+                              <div class="validate"></div>
+                            </div>
+                          </div>
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <textarea class="form-control" name="message" rows="5" data-rule="required"
+                                data-msg="Please write something for us" placeholder="Message"></textarea>
+                              <div class="validate"></div>
+                            </div>
+                          </div>
+                          <div class="col-md-12 text-center mb-3">
+                            <div class="loading">Loading</div>
+                            <div class="error-message"></div>
+                            <div class="sent-message">Your message has been sent. Thank you!</div>
+                          </div>
+                          <div class="col-md-12 text-center">
+                            <button type="submit" class="button button-a button-big button-rouded">Send Message</button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="title-box-2 pt-4 pt-md-0">
+                      <h5 class="title-left">
+                        Get in Touch
+                      </h5>
+                    </div>
+                    <div class="more-info">
+                      <p class="lead">
+                        eStore – Monitoring system of temperature and humidity in storage. We are happy and willing to
+                        serve you.
+                      </p>
+                      <ul class="list-ico">
+                        <li><span class="ion-ios-location"></span> Ho Chi Minh City University of Technology (HCMUT)
+                        </li>
+                        <li><span class="ion-ios-telephone"></span> (+84) 336482038</li>
+                        <li><span class="ion-email"></span> huy.nguyenxuan@hcmut.edu.vn</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- End Contact Section -->
+  </main><!-- End #main -->
+
+
+  <!-- ======= Footer ======= -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="copyright-box">
+            <div class="credits">
+              Designed by <strong>Group 3</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer><!-- End  Footer -->
+
+  <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="/public/vendor/jquery/jquery.min.js"></script>
+  <script src="/public/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/public/vendor/jquery.easing/jquery.easing.min.js"></script>
+  <script src="/public/vendor/php-email-form/validate.js"></script>
+  <script src="/public/vendor/waypoints/jquery.waypoints.min.js"></script>
+  <script src="/public/vendor/counterup/jquery.counterup.min.js"></script>
+  <script src="/public/vendor/owl.carousel/owl.carousel.min.js"></script>
+  <script src="/public/vendor/typed.js/typed.min.js"></script>
+  <script src="/public/vendor/venobox/venobox.min.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="/public/js/home.js"></script>
+
+  <!-- log out -->
+  <script>
+    document.getElementById("id_logout").onclick = function(){
+      $.ajax({
+              url:'/logout',
+              method:"GET",
+            }).done(result => {
+                    if(result){
+                        window.location.href ='/';
+                    }
+            })
+    }
+  </script>
+
+</body>
+
+</html>

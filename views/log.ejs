@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<head>
+    <title>eStore</title>
+    <script type="text/javascript" src="/script/jquery.js"> </script> 
+    <link rel="icon" href="../assets/img/icon_title.jpg" type="image/icon type">
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="/public/css/log.css" />
+</head>
+    <body>
+        <div id="id_bg">
+        	<div id="id_form">
+            	<div id="id_titleForm"> <b>eStore</b>
+                </div>
+                <input type="text" id="id_inText" name="username" placeholder="tên đăng nhập"/>
+                <input type="password" id="id_inPass" name="password" placeholder="mật khẩu"/>
+                <input type="button" id="id_inBtn" value="Đăng nhập"/>
+            </div>
+        </div>
+
+        <script>
+            
+            $('#id_inBtn').click(function(data, status){
+                $.ajax({
+                    url:'/auth',
+                    method:"POST",
+                    data:{
+                        username:$('#id_inText').val(),
+                        password:$('#id_inPass').val()
+                    }
+                }).done( result => {
+                    if(result){
+                        window.location.href ='/home';
+                    }
+                    else{
+                        alert("log in fail");
+                    }
+                })
+            })
+        </script>
+    </body>
+</html>

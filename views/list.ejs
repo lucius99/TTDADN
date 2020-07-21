@@ -1,24 +1,31 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Hello</title>
-    </head>
-    <body>
-        <table width = "500" border = "1">
-            <tr>
-                <td><b> ID      </b></td>
-                <td><b> Temp    </b></td>
-                <td><b> Humid   </b></td>
-                <td><b> Topic   </b></td>
-            </tr>
-            <% for (var i = 0; i < danhsach.length; i++) { %>
-                <tr>
-                <td><%= danhsach[i].device_id %> </td>
-                <td><%= danhsach[i].temp %></td>
-                <td><%= danhsach[i].humid %></td>
-                <td><%= danhsach[i].topic %></td>
-            </tr>
-            <% } %>
 
-    </body>
+<head>
+    <meta charset="utf-8">
+    <title>Hello</title>
+</head>
+
+<body>
+    <table width="500" border="1">
+        <tr>
+            <td><b> ID </b></td>
+            <td><b> Device </b></td>
+            <td><b> Temp </b></td>
+            <td><b> Humid </b></td>
+            <td><b> Topic </b></td>
+            <td><b> Date </b></td>
+        </tr>
+        <% for (var i = 0; i < danhsach.length; i++) { %>
+        <tr>
+            <td><%= danhsach[i].id %> </td>
+            <td><%= danhsach[i].device_id %> </td>
+            <td><%= danhsach[i].temp %></td>
+            <td><%= danhsach[i].humid %></td>
+            <td><%= danhsach[i].topic %></td>
+            <td><%= danhsach[i].date %></td>
+        </tr>
+        <% } %>
+
+</body>
+
 </html>
