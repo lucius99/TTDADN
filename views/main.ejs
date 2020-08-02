@@ -1,9 +1,69 @@
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>Hello</title>
-    </head>
-    <body>
-        Hi There!
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,900" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/grid.css">
+    <meta charset="utf-8">
+
+    <script src="socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrender/0.9.90/jsrender.min.js"></script>
+
+    <script>
+        var socket = io("http://localhost:3000");
+    </script>
+    <title>eStore</title>
+</head>
+
+<body>
+    <header>
+        <a href="#"><img class="logo" src="static/logo.png" alt="logo"></a>
+    </header>
+    <section class="temparature-section" id="temparature">
+        <div class="row">
+            <div class="col span-1-of-2">
+                <h2>Temparature</h2>
+                <div id="data1"></div>
+
+                <script id="Temparature" type="text/x-jsrender">
+                    {{:values[0]}}
+                </script>
+                <!-- <h2>Temparature</h2>
+                <% var i=danhsach.length; %>
+                <% var temp = danhsach[i-1].temp; %>
+                <p> <%=temp %> </p> -->
+            </div>
+            <div class="col span-1-of-2">
+                <h2>Humidity</h2>
+                <div id="data2"></div>
+
+                <script id="Humidity" type="text/x-jsrender">
+                    {{:values[1]}}
+                </script>
+                <!-- <h2>Humidity</h2>
+                <% var i=danhsach.length; %>
+                <% var humid = danhsach[i-1].humid; %>
+                <p> <%=humid %> </p> -->
+            </div>
+        </div>
+        <script>
+            var socket = io();
+            var tmpl1 = $.templates("#Temparature");
+            var tmpl2 = $.templates("#Humidity");
+
+            socket.on('data', function (data) {
+                console.log(data);
+                $('#data1').html(tmpl1.render(data));
+                $('#data2').html(tmpl2.render(data));
+            });
+
+        </script>
+
+    </section>
+
+</body>
+
 </html>
